@@ -33,7 +33,9 @@ export const Forecasts = () => {
         if (!forecasts || forecasts.length <= 1) return [];
         const offsets: number[] = [];
         let cumulative = 0;
-        for (let i = 0; i < forecasts.length; i++) {
+        // Build cumulative offsets for forecasts[0..length-2]:
+        // offset[i] = time from now until forecasts[i+1] starts
+        for (let i = 0; i < forecasts.length - 1; i++) {
             cumulative += forecasts[i].duration;
             offsets.push(cumulative);
         }
