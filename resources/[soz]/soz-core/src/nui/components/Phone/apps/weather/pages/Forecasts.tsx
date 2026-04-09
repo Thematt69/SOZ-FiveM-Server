@@ -6,6 +6,7 @@ import { useThemeConfig } from '../../../system/config/config.atom';
 import { WeatherIcon } from '../components/WeatherIcon';
 import { useWeather } from '../hooks/useWeather';
 import { useWeatherForecast } from '../hooks/useWeatherForecast';
+import { LongTermForecasts } from './LongTermForecasts';
 
 export const Forecasts = () => {
     const { t } = useTranslation();
@@ -58,6 +59,8 @@ export const Forecasts = () => {
                             );
                         })}
                     </ul>
+
+                    <LongTermForecasts />
                 </div>
             </div>
         </AppContent>

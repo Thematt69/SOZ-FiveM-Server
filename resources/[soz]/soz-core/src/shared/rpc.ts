@@ -88,6 +88,7 @@ export enum RpcServerEvent {
     GET_DISABLE_NPC = 'soz-core:utils:get-disable-npc',
 
     GET_FORECASTS = 'soz-core:weather:get-forecasts',
+    GET_LONG_TERM_FORECASTS = 'soz-core:weather:get-long-term-forecasts',
     GET_STORM_ALERT = 'soz-core:weather:get-storm-alert',
 
     VEHICLE_CUSTOM_GET_MODS = 'soz-core:vehicle:custom:get-mods',

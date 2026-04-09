@@ -14,6 +14,7 @@ import { Logger } from '../../core/logger';
 import { wait } from '../../core/utils';
 import { ClientEvent, ServerEvent } from '../../shared/event';
 import { Feature } from '../../shared/features';
+import { JobType } from '../../shared/job';
 import { RpcServerEvent } from '../../shared/rpc';
 import {
     addSecondstoTime,
@@ -21,6 +22,7 @@ import {
     Forecast,
     ForecastWithTemperature,
     IRLDayDurationInMinutes,
+    LongTermForecast,
     TemperatureRange,
     Time,
     TimeSynchro,
@@ -29,6 +31,7 @@ import {
 import { FeatureProvider } from '../feature/feature.provider';
 import { UpwPollutionProvider } from '../job/upw/upw.pollution.provider';
 import { Monitor } from '../monitor/monitor';
+import { PlayerService } from '../player/player.service';
 import { Store } from '../store/store';
 import { Halloween, Polluted, SpringAutumn, Winter, WMOWeatherMapping } from './forecast';
 import { DayAutumnTemperature, ForecastAdderTemperatures, NightAutumnTemperature } from './temperature';
@@ -52,6 +55,9 @@ export class WeatherProvider {
 
     @Inject(FeatureProvider)
     private featureProvider: FeatureProvider;
+
+    @Inject(PlayerService)
+    private playerService: PlayerService;
 
     private shouldUpdateWeather = true;
     private weatherSyncWithLA = false;
@@ -294,6 +300,69 @@ export class WeatherProvider {
     @Rpc(RpcServerEvent.GET_FORECASTS)
     public getForecasts(): ForecastWithTemperature[] {
         return this.incomingForecasts;
+    }
+
+    @Rpc(RpcServerEvent.GET_LONG_TERM_FORECASTS)
+    public getLongTermForecasts(source: number): LongTermForecast[] | null {
+        const player = this.playerService.getPlayer(source);
+
+        if (!player || (player.job.id !== JobType.News && player.job.id !== JobType.YouNews)) {
+            return null;
+        }
+
+        return this.generateLongTermForecasts();
+    }
+
+    private generateLongTermForecasts(): LongTermForecast[] {
+        const results: LongTermForecast[] = [];
+
+        // Average weather duration is ~12.5 real minutes (750_000 ms)
+        // 24 real hours = 1440 minutes => ~115 weather transitions
+        // 48 real hours = 2880 minutes => ~230 weather transitions
+        const stepsFor24h = 115;
+        const stepsFor48h = 230;
+
+        const currentWeather = this.incomingForecasts?.[0]?.weather || this.defaultWeather;
+        const temperatureImprecision = 5;
+
+        // Simulate weather chain for 24h
+        const forecast24h = this.simulateWeatherChain(currentWeather, stepsFor24h);
+        const time24h = this.estimateFutureTime(24 * 60 * 60);
+        const temp24h = this.getTemperature(forecast24h, time24h);
+        results.push({
+            label: '24h',
+            weather: forecast24h,
+            temperatureMin: temp24h - temperatureImprecision,
+            temperatureMax: temp24h + temperatureImprecision,
+        });
+
+        // Simulate weather chain for 48h
+        const forecast48h = this.simulateWeatherChain(currentWeather, stepsFor48h);
+        const time48h = this.estimateFutureTime(48 * 60 * 60);
+        const temp48h = this.getTemperature(forecast48h, time48h);
+        results.push({
+            label: '48h',
+            weather: forecast48h,
+            temperatureMin: temp48h - temperatureImprecision,
+            temperatureMax: temp48h + temperatureImprecision,
+        });
+
+        return results;
+    }
+
+    private simulateWeatherChain(startWeather: Weather, steps: number): Weather {
+        let weather = startWeather;
+        for (let i = 0; i < steps; i++) {
+            weather = this.getNextWeather(weather);
+        }
+        return weather;
+    }
+
+    private estimateFutureTime(realSecondsAhead: number): Time {
+        const futureTime = { ...this.currentTime };
+        const igSecondsAhead = realSecondsAhead * (IRLDayDurationInMinutes / DayDurationInMinutes);
+        addSecondstoTime(futureTime, igSecondsAhead);
+        return futureTime;
     }
 
     @Rpc(RpcServerEvent.GET_STORM_ALERT)

@@ -70,3 +70,10 @@ export type ForecastWithTemperature = {
     temperature: number;
     duration: number;
 };
+
+export type LongTermForecast = {
+    label: string;
+    weather: Weather;
+    temperatureMin: number;
+    temperatureMax: number;
+};

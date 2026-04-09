@@ -34,6 +34,7 @@ export const WeatherApp: FunctionComponent = () => {
 
     useEffect(() => {
         fetchNui(NuiEvent.PhoneAppWeatherFetchData);
+        fetchNui(NuiEvent.PhoneAppWeatherFetchLongTermForecasts);
     }, []);
 
     return (
