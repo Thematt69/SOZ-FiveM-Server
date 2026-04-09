@@ -14,7 +14,6 @@ import { Logger } from '../../core/logger';
 import { wait } from '../../core/utils';
 import { ClientEvent, ServerEvent } from '../../shared/event';
 import { Feature } from '../../shared/features';
-import { JobType } from '../../shared/job';
 import { RpcServerEvent } from '../../shared/rpc';
 import {
     addSecondstoTime,
@@ -31,7 +30,6 @@ import {
 import { FeatureProvider } from '../feature/feature.provider';
 import { UpwPollutionProvider } from '../job/upw/upw.pollution.provider';
 import { Monitor } from '../monitor/monitor';
-import { PlayerService } from '../player/player.service';
 import { Store } from '../store/store';
 import { Halloween, Polluted, SpringAutumn, Winter, WMOWeatherMapping } from './forecast';
 import { DayAutumnTemperature, ForecastAdderTemperatures, NightAutumnTemperature } from './temperature';
@@ -55,9 +53,6 @@ export class WeatherProvider {
 
     @Inject(FeatureProvider)
     private featureProvider: FeatureProvider;
-
-    @Inject(PlayerService)
-    private playerService: PlayerService;
 
     private shouldUpdateWeather = true;
     private weatherSyncWithLA = false;
@@ -303,13 +298,7 @@ export class WeatherProvider {
     }
 
     @Rpc(RpcServerEvent.GET_LONG_TERM_FORECASTS)
-    public getLongTermForecasts(source: number): LongTermForecast[] | null {
-        const player = this.playerService.getPlayer(source);
-
-        if (!player || (player.job.id !== JobType.News && player.job.id !== JobType.YouNews)) {
-            return null;
-        }
-
+    public getLongTermForecasts(): LongTermForecast[] {
         return this.generateLongTermForecasts();
     }
 

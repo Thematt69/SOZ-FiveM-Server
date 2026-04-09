@@ -33,7 +33,7 @@ export class PhoneAppWeatherProvider {
 
     @OnNuiEvent(NuiEvent.PhoneAppWeatherFetchLongTermForecasts)
     async fetchLongTermForecasts() {
-        const forecasts = await emitRpc<LongTermForecast[] | null>(RpcServerEvent.GET_LONG_TERM_FORECASTS);
+        const forecasts = await emitRpc<LongTermForecast[]>(RpcServerEvent.GET_LONG_TERM_FORECASTS);
         this.nuiDispatch.dispatch('phone', 'AppWeatherSetLongTermForecasts', forecasts);
     }
 }

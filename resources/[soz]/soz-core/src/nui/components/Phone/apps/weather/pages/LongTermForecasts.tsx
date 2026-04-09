@@ -9,7 +9,7 @@ export const LongTermForecasts = () => {
     const { fixWeatherName } = useWeather();
     const { longTermForecasts } = useLongTermForecast();
 
-    if (!longTermForecasts || longTermForecasts.length === 0) {
+    if (longTermForecasts.length === 0) {
         return null;
     }
 

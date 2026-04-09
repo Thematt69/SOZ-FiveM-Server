@@ -63,5 +63,5 @@ export interface NuiPhoneMap {
     AppSocietyPatchData: SocietyMessage;
     AppWeatherSetData: ForecastWithTemperature[];
     AppWeatherSetStormAlert: number;
-    AppWeatherSetLongTermForecasts: LongTermForecast[] | null;
+    AppWeatherSetLongTermForecasts: LongTermForecast[];
 }

@@ -249,7 +249,7 @@ export const fr = {
             LOADING: 'Récupération de la météo...',
             LONG_TERM: {
                 TITLE: 'Projections long terme',
-                DISCLAIMER: 'Projections approximatives réservées aux médias',
+                DISCLAIMER: 'Projections approximatives, hors événements exceptionnels',
             },
         },
         DARKWEB: {

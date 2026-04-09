@@ -12,7 +12,7 @@ export const alertInProgressAtom = atomWithRefresh<boolean>(get => get(alertEndT
 export const forecastsAtom = atom<ForecastWithTemperature[]>([]);
 export const currentForecastAtom = atom<ForecastWithTemperature | undefined>(get => get(forecastsAtom)[0]);
 
-export const longTermForecastsAtom = atom(null as LongTermForecast[] | null);
+export const longTermForecastsAtom = atom<LongTermForecast[]>([]);
 
 export const useAppWeatherStateHandlers = () => {
     const setAlertEndTimestamp = useSetAtom(alertEndTimestampAtom);
