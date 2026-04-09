@@ -27,7 +27,7 @@ export const LongTermForecasts = () => {
                         </div>
                         <div>
                             <span className="mr-2">
-                                {forecast.temperatureMin}° / {forecast.temperatureMax}°C
+                                {forecast.temperatureMin}°C / {forecast.temperatureMax}°C
                             </span>
                         </div>
                     </li>
