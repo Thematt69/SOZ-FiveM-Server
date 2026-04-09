@@ -7,7 +7,7 @@ import { NoteItem } from '@public/shared/phone/apps/notes';
 import { PhotoItem } from '@public/shared/phone/apps/photos';
 import { SocietyMessage } from '@public/shared/phone/apps/society';
 import { ActiveCall, CallHistory, Contact, Message, MessageConversation } from '@public/shared/phone/simcard';
-import { ForecastWithTemperature } from '@public/shared/weather';
+import { ForecastWithTemperature, LongTermForecast } from '@public/shared/weather';
 
 export interface NuiPhoneMap {
     SetAvailability: boolean;
@@ -63,4 +63,5 @@ export interface NuiPhoneMap {
     AppSocietyPatchData: SocietyMessage;
     AppWeatherSetData: ForecastWithTemperature[];
     AppWeatherSetStormAlert: number;
+    AppWeatherSetLongTermForecasts: LongTermForecast[] | null;
 }
