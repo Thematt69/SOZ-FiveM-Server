@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AppContent } from '../../../components/system/AppContent';
@@ -6,6 +7,20 @@ import { useThemeConfig } from '../../../system/config/config.atom';
 import { WeatherIcon } from '../components/WeatherIcon';
 import { useWeather } from '../hooks/useWeather';
 import { useWeatherForecast } from '../hooks/useWeatherForecast';
+import { LongTermForecasts } from './LongTermForecasts';
+
+const formatRelativeTime = (ms: number): string => {
+    const totalMinutes = Math.round(ms / 60_000);
+    if (totalMinutes < 60) {
+        return `${totalMinutes} min`;
+    }
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (minutes === 0) {
+        return `${hours}h`;
+    }
+    return `${hours}h${String(minutes).padStart(2, '0')}`;
+};
 
 export const Forecasts = () => {
     const { t } = useTranslation();
@@ -13,6 +28,19 @@ export const Forecasts = () => {
 
     const { forecasts } = useWeatherForecast();
     const { fixWeatherName } = useWeather();
+
+    const cumulativeOffsets = useMemo(() => {
+        if (!forecasts || forecasts.length <= 1) return [];
+        const offsets: number[] = [];
+        let cumulative = 0;
+        // Build cumulative offsets for forecasts[0..length-2]:
+        // offset[i] = time from now until forecasts[i+1] starts
+        for (let i = 0; i < forecasts.length - 1; i++) {
+            cumulative += forecasts[i].duration;
+            offsets.push(cumulative);
+        }
+        return offsets;
+    }, [forecasts]);
 
     if (!forecasts || forecasts.length === 0) {
         return (
@@ -40,6 +68,7 @@ export const Forecasts = () => {
                     <p className="mb-2">Prévisions</p>
                     <ul className="p-2 bg-opacity-10 bg-black rounded">
                         {forecasts.slice(1).map((forecast, index) => {
+                            const offsetMs = cumulativeOffsets[index] || 0;
                             return (
                                 <li
                                     className="py-1 flex flex-row justify-between h-10 leading-7"
@@ -51,13 +80,18 @@ export const Forecasts = () => {
                                             {t(`WEATHER.FORECASTS.${fixWeatherName(forecast.weather)}`)}
                                         </span>
                                     </div>
-                                    <div>
-                                        <span className="mr-2">{forecast.temperature}°C</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs opacity-60">
+                                            {formatRelativeTime(offsetMs)}
+                                        </span>
+                                        <span>{forecast.temperature}°C</span>
                                     </div>
                                 </li>
                             );
                         })}
                     </ul>
+
+                    <LongTermForecasts />
                 </div>
             </div>
         </AppContent>

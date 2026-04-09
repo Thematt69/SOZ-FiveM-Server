@@ -6,7 +6,7 @@ import { OnEvent, OnNuiEvent } from '../../../core/decorators/event';
 import { emitRpc } from '../../../core/rpc';
 import { NuiEvent } from '../../../shared/event/nui';
 import { RpcServerEvent } from '../../../shared/rpc';
-import { ForecastWithTemperature } from '../../../shared/weather';
+import { ForecastWithTemperature, LongTermForecast } from '../../../shared/weather';
 import { NuiDispatch } from '../../nui/nui.dispatch';
 
 @Provider()
@@ -29,5 +29,11 @@ export class PhoneAppWeatherProvider {
     async updateStormAlert() {
         const storm = await emitRpc<number>(RpcServerEvent.GET_STORM_ALERT);
         this.nuiDispatch.dispatch('phone', 'AppWeatherSetStormAlert', storm);
+    }
+
+    @OnNuiEvent(NuiEvent.PhoneAppWeatherFetchLongTermForecasts)
+    async fetchLongTermForecasts() {
+        const forecasts = await emitRpc<LongTermForecast[]>(RpcServerEvent.GET_LONG_TERM_FORECASTS);
+        this.nuiDispatch.dispatch('phone', 'AppWeatherSetLongTermForecasts', forecasts);
     }
 }

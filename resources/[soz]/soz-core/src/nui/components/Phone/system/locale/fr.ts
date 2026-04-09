@@ -247,6 +247,10 @@ export const fr = {
                 SANDSTORM: 'Tempête de sable',
             },
             LOADING: 'Récupération de la météo...',
+            LONG_TERM: {
+                TITLE: 'Projections long terme',
+                DISCLAIMER: 'Projections approximatives, hors événements exceptionnels',
+            },
         },
         DARKWEB: {
             LOADING: 'Récupération des rooms ...',
